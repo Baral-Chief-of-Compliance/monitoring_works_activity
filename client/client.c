@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <winsock2.h>
-#include <time.h>
-#include <Windows.h>
+#include <string.h>
+// #include <Windows.h>
 
 #pragma comment(lib, "ws2_32.lib") //Winsock Library
 
@@ -9,6 +9,14 @@ int main(){
     WSADATA wsa;
     SOCKET s;
     struct sockaddr_in server;
+
+    
+    char login[256];
+    printf("Enter your login: ");
+    scanf("%s", login);
+
+    
+
 
     printf("\nInitialising Winsock...");
 
@@ -42,14 +50,30 @@ int main(){
         return 1;
     }
 
+
+    char *username = getenv("username");
+    char *userdomain = getenv("userdomain");
+    char send_data[2] = "\0";
+
+    strncat(send_data, login, (int)strlen(login));
+    strncat(send_data, "_", 1);
+    strncat(send_data, username, (int)strlen(username));
+    strncat(send_data, "_", 1);
+    strncat(send_data, userdomain, (int)strlen(userdomain));
+
+    printf("%s\n", send_data);
+    printf("%s_%s\n", username, userdomain);
     char *sendbuf = "{'hello': 'hi'}";
-    send(s, sendbuf, sizeof(sendbuf),  0);
-    printf("Connected.");
+    // send(s, sendbuf, (int)strlen(sendbuf),  0);
+    // printf("Connected.");
     // closesocket(s);
     // WSACleanup();
 
     while (1){
-        printf("conenct\n");
+        // printf("%s\n", username);
+        // printf("%s\n", userdomain);
+        // printf("%s\n",sendbuf);
+        send(s, send_data, (int)strlen(send_data),  0);
         Sleep(1000);
     }
     return 0;

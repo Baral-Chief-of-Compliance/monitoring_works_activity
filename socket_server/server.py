@@ -4,6 +4,8 @@ from _thread import *
 import redis
 from dotenv import load_dotenv
 import json
+from datetime import datetime, date
+import time
 
 
 load_dotenv()
@@ -38,21 +40,32 @@ def threaded_client(connection, address):
         print(data.decode('utf-8'))
 
         data = data.decode('utf-8')
+        data = data.split("_")
 
-        if data == "photo_is_made":
-            redis_screenshot_db.delete(f"{address}")
-        else:
+        redis_set = {
+            "name": data[1],
+            "domain": data[2],
+            "time": datetime.now().strftime("%H:%M:%S"),
+            "date": date.today().strftime("%d/%m/%Y"),
+            "login": data[0]
+        }
 
-            data_map = json.loads(data)
-            key_db = f"{address}"
-            redis_db.hset(key_db, mapping=data_map)
+        print(f"\n\n{redis_set}")
+
+        # if data == "photo_is_made":
+        #     redis_screenshot_db.delete(f"{address}")
+        # else:
+
+        # data_map = json.dumps(redis_set)
+        key_db = f"{address}"
+        redis_db.hset(key_db, mapping=redis_set)
 
         if not data:
             break
-        if redis_screenshot_db.get(key_db):
-            connection.sendall(str.encode("make_a_photo"))
-        else:
-            connection.sendall(str.encode(reply))
+        # if redis_screenshot_db.get(key_db):
+        #     connection.sendall(str.encode("make_a_photo"))
+        # else:
+        #     connection.sendall(str.encode(reply))
 
     connection.close()
 
