@@ -35,37 +35,44 @@ def threaded_client(connection, address):
 
     while True:
         data = connection.recv(2048)
-        reply = 'Server Says: ' + data.decode('utf-8')
-        print(f"сообщение от {address}")
-        print(data.decode('utf-8'))
-
         data = data.decode('utf-8')
-        data = data.split("_")
+        if ('_' in data):
+            
+            reply = data
+            print(f"сообщение от {address}")
+            print(data)
 
-        redis_set = {
-            "name": data[1],
-            "domain": data[2],
-            "time": datetime.now().strftime("%H:%M:%S"),
-            "date": date.today().strftime("%d/%m/%Y"),
-            "login": data[0]
-        }
+            
+            data = data.split("_")
 
-        print(f"\n\n{redis_set}")
+            redis_set = {
+                "name": data[1],
+                "domain": data[2],
+                "time": datetime.now().strftime("%H:%M:%S"),
+                "date": date.today().strftime("%d/%m/%Y"),
+                "login": data[0]
+            }
 
-        # if data == "photo_is_made":
-        #     redis_screenshot_db.delete(f"{address}")
-        # else:
+            print(f"\n\n{redis_set}")
 
-        # data_map = json.dumps(redis_set)
-        key_db = f"{address}"
-        redis_db.hset(key_db, mapping=redis_set)
+            # if data == "photo_is_made":
+            #     redis_screenshot_db.delete(f"{address}")
+            # else:
+
+            # data_map = json.dumps(redis_set)
+            key_db = f"{address}"
+            redis_db.hset(key_db, mapping=redis_set)
+        
+        else:
+            print(f"сообщение от {address}")
+            print(data)
 
         if not data:
             break
-        # if redis_screenshot_db.get(key_db):
-        #     connection.sendall(str.encode("make_a_photo"))
-        # else:
-        #     connection.sendall(str.encode(reply))
+        if redis_screenshot_db.get(key_db):
+            connection.sendall(str.encode("make_a_photo"))
+        else:
+            connection.sendall(str.encode(reply))
 
     connection.close()
 

