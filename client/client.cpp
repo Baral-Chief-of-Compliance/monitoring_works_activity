@@ -133,7 +133,7 @@ int main(){
             printf("not equal");
         }
 
-        Sleep(1000);
+        Sleep(10000);
     }
     return 0;
 }
